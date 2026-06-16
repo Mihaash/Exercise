@@ -54,7 +54,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "target/*.jar"
-          target: "/opt/myapp"
+          target: "/home/ubuntu"
 
       - name: Deploy To EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -65,7 +65,7 @@ jobs:
           script: |
             echo "Searching for JAR..."
 
-            JAR=$(find /opt/myapp -name "*.jar" | head -1)
+            JAR=$(find /home/ubuntu -name "*.jar" | head -1)
 
             echo "Found JAR: $JAR"
 
@@ -76,12 +76,12 @@ jobs:
 
             nohup java -jar "$JAR" \
               --server.port=8000 \
-              > /opt/myapp/app.log 2>&1 < /dev/null &
+              > /home/ubuntu/app.log 2>&1 < /dev/null &
 
             sleep 15
 
             echo "Application Log:"
-            cat /opt/myapp/app.log || true
+            cat /home/ubuntu/app.log || true
 
             echo "Port Check:"
             ss -tulpn | grep 8000 || true
