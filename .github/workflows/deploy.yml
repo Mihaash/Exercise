@@ -53,8 +53,9 @@ jobs:
           host: ${{ secrets.SSH_IP }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "target/*.jar"
-          target: "/home/ubuntu"
+          source: "target/calculator-project-1.0-SNAPSHOT.jar"
+          target: "/home/ubuntu/deploy"
+          strip_components: 1
 
       - name: Deploy To EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -66,14 +67,14 @@ jobs:
             echo "Stopping any process on port 8000..."
             fuser -k 8000/tcp || true
 
-            echo "Searching for JAR..."
-            # Look for the specific JAR we just built
-            JAR=$(find /home/ubuntu -name "calculator-project-1.0-SNAPSHOT.jar" | head -1)
+            echo "Preparing deployment directory..."
+            mkdir -p /home/ubuntu/deploy
 
-            echo "Found JAR: $JAR"
+            echo "Checking JAR..."
+            JAR="/home/ubuntu/deploy/calculator-project-1.0-SNAPSHOT.jar"
 
-            if [ -z "$JAR" ]; then
-              echo "JAR file not found"
+            if [ ! -f "$JAR" ]; then
+              echo "ERROR: JAR file not found at $JAR"
               exit 1
             fi
 
