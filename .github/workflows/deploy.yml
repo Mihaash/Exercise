@@ -63,9 +63,12 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "Searching for JAR..."
+            echo "Stopping existing application..."
+            pkill -f 'calculator-project' || true
 
-            JAR=$(find /home/ubuntu -name "*.jar" | head -1)
+            echo "Searching for JAR..."
+            # Look for the specific JAR we just built
+            JAR=$(find /home/ubuntu -name "calculator-project-1.0-SNAPSHOT.jar" | head -1)
 
             echo "Found JAR: $JAR"
 
@@ -74,14 +77,21 @@ jobs:
               exit 1
             fi
 
+            echo "Starting application..."
             nohup java -jar "$JAR" \
               --server.port=8000 \
               > /home/ubuntu/app.log 2>&1 < /dev/null &
 
+            echo "Waiting for application to start..."
             sleep 15
 
-            echo "Application Log:"
-            cat /home/ubuntu/app.log || true
+            echo "Application Log Snapshot:"
+            tail -n 50 /home/ubuntu/app.log || true
 
-            echo "Port Check:"
-            ss -tulpn | grep 8000 || true
+            echo "Port Check (8000):"
+            if ss -tulpn | grep -q ":8000 "; then
+              echo "Application is running on port 8000"
+            else
+              echo "ERROR: Application is NOT running on port 8000"
+              exit 1
+            fi
