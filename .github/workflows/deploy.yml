@@ -29,12 +29,15 @@ jobs:
       - name: Run Unit Tests
         run: mvn clean test
 
-      - name: Build Application
-        run: mvn clean package
-
       - name: Update RESULT.md
         run: |
           echo "| $(date -u '+%Y-%m-%d %H:%M:%S UTC') | PASS |" >> RESULT.md
+
+      - name: Copy RESULT.md to Resources
+        run: cp RESULT.md src/main/resources/RESULT.md
+
+      - name: Build Application
+        run: mvn clean package
 
       - name: Commit RESULT.md
         run: |

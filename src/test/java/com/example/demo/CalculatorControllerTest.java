@@ -3,11 +3,19 @@ package com.example.demo;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CalculatorControllerTest {
 
     CalculatorController controller =
             new CalculatorController();
+
+    @Test
+    void testHome() {
+        String response = controller.home();
+        assertTrue(response.contains("Test Execution Report"));
+        assertTrue(response.contains("PASS"));
+    }
 
     @Test
     void test1() {
