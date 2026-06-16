@@ -63,8 +63,8 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "Stopping existing application..."
-            pkill -f 'calculator-project' || true
+            echo "Stopping any process on port 8000..."
+            fuser -k 8000/tcp || true
 
             echo "Searching for JAR..."
             # Look for the specific JAR we just built
